@@ -10,10 +10,14 @@ class CustomTextField extends StatelessWidget{
   
   final String label;// 텍스트 필드 제목
   final bool isTime; // 시간 선택하는 텍스트 필드인지 유무
+  final FormFieldSetter<String> onSaved;
+  final FormFieldValidator<String> validator;
   
   const CustomTextField({
     required this.label, 
     required this.isTime,
+    required this.onSaved,
+    required this.validator,
     Key? key,
   }) : super(key:key);
 
@@ -33,6 +37,8 @@ class CustomTextField extends StatelessWidget{
         Expanded(
             flex: isTime? 0:1, // isTime이 true면 0, flase면 1
             child: TextFormField(
+              onSaved: onSaved, // 폼 저장했을때 실행할 함수
+              validator: validator, // 폼 검증했을때 실행할 함수
               cursorColor: Colors.grey, // 커서 색상 변경
               maxLines: isTime? 1 : null,
               //시간 관련 텍스트 필드가 아니면 한줄 이상 작성 가능
