@@ -33,7 +33,9 @@ class HomeScreen extends StatefulWidget{
               showModalBottomSheet( // BottomSheet 열기
                   context: context,
                   isDismissible: true, // 배경 탭했을때 bottomsheet 닫기
-                  builder: (_) => ScheduleBottomSheet(),
+                  builder: (_) => ScheduleBottomSheet(
+                    selectDate:  selectedDate, //선택된 날짜(selectedDate) 넘겨주기
+                  ),
                 //BottomSheet 높이를 화면의 최대 높이로 정의하고 스크롤 가능하게 변경
                 isScrollControlled: true,
               );
