@@ -1,11 +1,14 @@
 
 import 'package:calendar_schedular/component/custom_text_field.dart';
 import 'package:calendar_schedular/database/drift_database.dart';
+import 'package:calendar_schedular/model/schedule_model.dart';
+import 'package:calendar_schedular/provider/schedule_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:drift/drift.dart' hide Column;
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 import '../const/colors.dart';
 
@@ -89,7 +92,8 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet>{
                 SizedBox(
                   width : double.infinity,
                   child : ElevatedButton( // 저장버튼
-                      onPressed: onSavePressed,
+                      // onPressed: onSavePressed,
+                      onPressed: () => onSavePressed(context), //함수에 context 전달
                       style: ElevatedButton.styleFrom(
                         backgroundColor: PRIMARY_COLOR, // primary 대신 backgroundColor 사용
                       ),
@@ -104,7 +108,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet>{
     );
   }
 
-  void onSavePressed() async{
+  void onSavePressed(BuildContext context) async{
     if(formkey.currentState!.validate()){ // 폼 검증하기
       formkey.currentState!.save(); //폼 저장하기
 
@@ -112,12 +116,25 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet>{
       // print(endTime);
       // print(content);
       // 기존에 있떤 print()문을 모두 삭제하세요!
-      await GetIt.I<LocalDatabase>().createSchedule(//일정생성하기
-        SchedulesCompanion(
-          startTime: Value(startTime!),
-          endTime:
-        )
+      // await GetIt.I<LocalDatabase>().createSchedule(//일정생성하기
+      //   SchedulesCompanion(
+      //     startTime: Value(startTime!),
+      //     endTime: Value(endTime!),
+      //     content: Value(content!),
+      //     date: Value(widget.selectDate),
+      //   )
+      // );
+
+      context.read<ScheduleProvider>().createSchedule(
+          schedule: ScheduleModel(
+              id: 'new_model',
+              content: content!,
+              date: widget.selectDate,
+              startTime: startTime!,
+              endTime: endTime!,
+          ),
       );
+      Navigator.of(context).pop();
     }
   }
 
