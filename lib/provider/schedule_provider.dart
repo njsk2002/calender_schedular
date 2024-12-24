@@ -1,12 +1,17 @@
 
 
 import 'package:calendar_schedular/model/schedule_model.dart';
+import 'package:calendar_schedular/repository/auth_repository.dart';
 import 'package:calendar_schedular/repository/schedule_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:uuid/uuid.dart';
 
 class ScheduleProvider extends ChangeNotifier{
-  final ScheduleRepository repository; //API 요청 로직을 담은 클래스
+  final AuthRepository authRepository;
+  final ScheduleRepository scheduleRepository; //API 요청 로직을 담은 클래스
+
+  String? accessToken;
+  String? refreshToken;
 
   DateTime selectedDate = DateTime.utc(
     DateTime.now().year,
@@ -16,7 +21,8 @@ class ScheduleProvider extends ChangeNotifier{
   Map<DateTime, List<ScheduleModel>> cache = {}; //일정 정보를 저장해둘 변수
 
   ScheduleProvider({
-    required this.repository,
+    required this.scheduleRepository,
+    required this.authRepository,
 }) : super() {
     getSchedules(date: selectedDate);
   }
@@ -24,7 +30,7 @@ class ScheduleProvider extends ChangeNotifier{
   void getSchedules ({
     required DateTime date,
   }) async{
-    final resp = await repository.getSchedules(date: date);//get 메서드보내기
+    final resp = await scheduleRepository.getSchedules(date: date);//get 메서드보내기
     
     //선택한 날짜의 일정을 업데이트하기
     cache.update(date, (value) => resp, ifAbsent: () => resp);
@@ -63,7 +69,7 @@ class ScheduleProvider extends ChangeNotifier{
 
     try{
       // API 요청
-      final savedSchedule = await repository.createSchedule(schedule: schedule);
+      final savedSchedule = await scheduleRepository.createSchedule(schedule: schedule);
 
       cache.update( // 서버 응답 기반으로 캐시 업데이트
         targetDate,
@@ -122,7 +128,7 @@ class ScheduleProvider extends ChangeNotifier{
     notifyListeners();
 
     try {
-      await repository.deleteSchdule(id: id); // 삭제 실행함수 실행
+      await scheduleRepository.deleteSchdule(id: id); // 삭제 실행함수 실행
     } catch (e) {
       //삭제 실패 시 캐시 롤백하기
       cache.update(
@@ -144,5 +150,91 @@ class ScheduleProvider extends ChangeNotifier{
     selectedDate = date; // 현재 선택된 날짜를 매개변수로 입력받는 날짜로 변경
     notifyListeners();
   }
+
+  ///////////////////////////////////////////////////////////////////
+  ////////////  향후 AuthProvider로 변경 ////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+  //토큰 관리
+  updateTokens({
+    String? refreshToken,
+    String? accessToken,
+}) {
+    //refreshToken이 입력됐을 경우 refreshToken 업데이트
+    if (refreshToken != null){
+      this.refreshToken = refreshToken;
+    }
+    //accessToken이 입력되었을 경우 accessToken 업데이트
+    if (accessToken != null){
+      this.accessToken = accessToken;
+    }
+
+    notifyListeners();
+  }
+
+  //회원가입
+ Future<void> register({
+    required String email,
+    required String password,
+}) async {
+    // AuthRepository에 미리 구현해둔 register() 함수를 실행
+   final resp = await authRepository.register(
+       email: email,
+       password: password
+   );
+
+   //반환받는 토큰을 기반으로 토큰 프로퍼티를 업그레이드
+   updateTokens(
+     refreshToken: resp.refreshToken,
+     accessToken: resp.accessToken,
+   );
+ }
+
+ //로그인
+
+Future<void> login({
+    required String email,
+    required String password,
+}) async {
+    final resp = await authRepository.login(
+        email: email,
+        password: password
+    );
+    updateTokens(
+      refreshToken: resp.refreshToken,
+      accessToken: resp.accessToken,
+    );
+}
+
+//로그 아웃
+logout() {
+  //refreshToken과 accessToken을 null로 업데이트해서 logout상태로 전환
+  refreshToken = null;
+  accessToken = null;
+
+   //로그 아웃과 동시에 일정 정보 캐시도 모두 삭제
+  cache = {};
+  notifyListeners();
+
+}
+
+// refreshToken과 accessToken 재발급
+rotateToken({
+    required String refreshToken,
+    required bool isRefreshToken,
+}) async {
+    // isRefreshToken이 true일 경우 refreshToken 재발급
+    // false 일 경우 accessToken 재발급
+  if(isRefreshToken){
+    final token = await authRepository.rotateRefreshToken(refreshToken: refreshToken);
+
+    this.refreshToken = token;
+  } else{
+    final token = await authRepository.rotateAccessToken(refreshToken: refreshToken);
+    accessToken = token;
+  }
+
+  notifyListeners();
+}
 
 }//class

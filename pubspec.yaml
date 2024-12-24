@@ -63,6 +63,9 @@ dependencies:
   get_it: 8.0.2 # 프로젝트 전역으로 의존성 주입을 가능하게 하는 플러그인
   provider: 6.1.2 # 글로벌 상태 관리 플러그인
 
+  flutter_inappwebview: ^5.8.0
+
+
 
 
 
