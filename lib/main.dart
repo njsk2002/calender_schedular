@@ -1,6 +1,8 @@
 import 'package:calendar_schedular/database/drift_database.dart';
 import 'package:calendar_schedular/provider/schedule_provider.dart';
+import 'package:calendar_schedular/repository/auth_repository.dart';
 import 'package:calendar_schedular/repository/schedule_repository.dart';
+import 'package:calendar_schedular/screen/auth_screen.dart';
 import 'package:calendar_schedular/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -18,14 +20,20 @@ void main() async{
 
   GetIt.I.registerSingleton<LocalDatabase>(database);
 
-  final repository = ScheduleRepository();
-  final scheduleProvider = ScheduleProvider(repository: repository);
+  // final repository = ScheduleRepository();
+  // final scheduleProvider = ScheduleProvider(scheduleRepository: repository);
 
+  final scheduleRepository = ScheduleRepository();
+  final authRepository = AuthRepository();
+  final scheduleProvider = ScheduleProvider(
+      scheduleRepository: scheduleRepository,
+      authRepository: authRepository
+  );
   runApp(
     ChangeNotifierProvider( // Provider 하위위젯에 제공하기
         create: (_) => scheduleProvider,
         child: MaterialApp(
-          home: HomeScreen(),
+          home: AuthScreen(),
    ),
   ),
   );

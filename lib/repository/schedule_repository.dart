@@ -10,7 +10,8 @@ class ScheduleRepository{
   final _dio = Dio();
   //final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/schedule';
   //final _targetUrl = 'http://${Platform.isAndroid ? '127.0.0.1' : 'localhost'}:5000/schedule/calendar_data';
-  final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : '127.0.0.1'}:5000/schedule/calendar_data';
+   //final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : '127.0.0.1'}:5000/schedule/calendar_data';
+  final _targetUrl = 'http://${Platform.isAndroid ? '192.168.0.16' : '127.0.0.1'}:5000/schedule/calendar_data';
 
   //안드로이드에서는 10.0.2.2가 localhost에 해당함
 
