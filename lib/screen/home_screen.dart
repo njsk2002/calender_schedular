@@ -23,12 +23,31 @@ import '../database/drift_database.dart';
 
   // class _HomescreenState extends State<HomeScreen>{
 
-class HomeScreen extends StatelessWidget{
+// class HomeScreen extends StatelessWidget{
+class HomeScreen extends StatefulWidget {
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+
+}
+
+class _HomeScreenState extends State<HomeScreen>{
+
     DateTime selectedDate = DateTime.utc(
       DateTime.now().year,
       DateTime.now().month,
       DateTime.now().day,
     );
+
+    @override
+    void initState() {
+      super.initState();
+
+      // HomeScreen 위젯이 생성되면 오늘 날짜이ㅡ 일정을 바로 요청
+      context.read<ScheduleProvider>().getSchedules(
+          date: selectedDate,
+      );
+    }
 
 
     @override
@@ -173,6 +192,8 @@ class HomeScreen extends StatelessWidget{
       provider.getSchedules(date: selectedDate);
 
     }
+
+
 
 
 
