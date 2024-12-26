@@ -30,7 +30,12 @@ class ScheduleProvider extends ChangeNotifier{
   void getSchedules ({
     required DateTime date,
   }) async{
-    final resp = await scheduleRepository.getSchedules(date: date);//get 메서드보내기
+    final resp = await scheduleRepository.getSchedules(
+        date: date,
+        //로그인을 해야 사용자와 관련된 일정 정보를 가져오는 getSchedules()함수를
+        //실행할수 있는 화면으로 이동함으로 !를  붙여서 accessToken이
+        //null이 아님을 명시함.
+        accessToken: accessToken!);//get 메서드보내기
     
     //선택한 날짜의 일정을 업데이트하기
     cache.update(date, (value) => resp, ifAbsent: () => resp);
@@ -69,7 +74,10 @@ class ScheduleProvider extends ChangeNotifier{
 
     try{
       // API 요청
-      final savedSchedule = await scheduleRepository.createSchedule(schedule: schedule);
+      final savedSchedule = await scheduleRepository.createSchedule(
+          schedule: schedule,
+          accessToken: accessToken!,
+      );
 
       cache.update( // 서버 응답 기반으로 캐시 업데이트
         targetDate,
@@ -128,7 +136,10 @@ class ScheduleProvider extends ChangeNotifier{
     notifyListeners();
 
     try {
-      await scheduleRepository.deleteSchdule(id: id); // 삭제 실행함수 실행
+      await scheduleRepository.deleteSchdule(
+          id: id,
+          accessToken: accessToken!,
+      ); // 삭제 실행함수 실행
     } catch (e) {
       //삭제 실패 시 캐시 롤백하기
       cache.update(

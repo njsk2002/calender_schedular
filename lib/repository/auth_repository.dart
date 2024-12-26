@@ -26,7 +26,7 @@ class AuthRepository {
     );
 
     //record 타입으로 토큰을 반환
-    return (refreshToken : result.data['reflashToken'] as String, accessToken:
+    return (refreshToken : result.data['refreshToken'] as String, accessToken:
     result.data['accessToken'] as String);
   }
 
@@ -37,11 +37,11 @@ class AuthRepository {
   required String password,
 }) async{
   //이메일:비밀번호 형태로 문자열 타입으로 구성
-    final emainAndPassword = '$email:$password';
+    final emailAndPassword = '$email:$password';
     //UTF8 인코딩으로부터 base64로 변환할수 있는 코덱을 생성
     Codec<String, String> stringToBase64 = utf8.fuse(base64);
     //emailAndPassword 변수를 base64로 인코딩
-    final encoded = stringToBase64.encode(emainAndPassword);
+    final encoded = stringToBase64.encode(emailAndPassword);
 
     //인코딩된 문자열을 헤더에 담아서 로그인 요청을 보냄
     final result = await _dio.post(
@@ -54,7 +54,7 @@ class AuthRepository {
     );
 
     //record 형태로 토큰을 반환
-    return (refreshToken: result.data['refresgToken'] as String,
+    return (refreshToken: result.data['refreshToken'] as String,
     accessToken: result.data['accessToken'] as String);
   }
 
